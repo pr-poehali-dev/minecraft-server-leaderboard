@@ -9,14 +9,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Icon from "@/components/ui/icon";
 import { useState } from "react";
+import Chat from "@/components/Chat";
+import ColorPicker from "@/components/ColorPicker";
+import VisualEffects from "@/components/VisualEffects";
+import BackgroundSelector from "@/components/BackgroundSelector";
 
 const Index = () => {
   const [userProfile, setUserProfile] = useState({
     nickname: "",
     avatar: "🔥",
     profileColor: "neon-green",
+    customColor: "#00ff41",
     bio: "",
-    favoriteMode: "ranked"
+    favoriteMode: "ranked",
+    effects: {
+      glow: false,
+      glowColor: "#00ff41",
+      glowIntensity: 5,
+      animation: "none",
+      shadow: false,
+      shadowColor: "#000000",
+      textEffect: "none",
+      particles: false
+    },
+    background: {
+      type: "solid",
+      gradient: {
+        colors: ["#1a1a2e"],
+        direction: "to right"
+      },
+      pattern: "dots",
+      opacity: 80,
+      animation: "none"
+    }
   });
 
   const [isRegistered, setIsRegistered] = useState(false);
@@ -179,82 +204,103 @@ const Index = () => {
                       Регистрация
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-cyber-dark border-neon-green/30 text-white">
+                  <DialogContent className="bg-cyber-dark border-neon-green/30 text-white max-w-3xl">
                     <DialogHeader>
                       <DialogTitle className="text-2xl font-bold text-neon-green font-['Orbitron']">
                         Регистрация игрока
                       </DialogTitle>
                       <DialogDescription className="text-gray-400">
-                        Создай свой профиль на сервере BedWars Pro
+                        Создай свой уникальный профиль на сервере BedWars Pro
                       </DialogDescription>
                     </DialogHeader>
                     
-                    <div className="space-y-4 mt-4">
-                      <div>
-                        <Label htmlFor="nickname" className="text-white">Никнейм</Label>
-                        <Input
-                          id="nickname"
-                          value={userProfile.nickname}
-                          onChange={(e) => setUserProfile({...userProfile, nickname: e.target.value})}
-                          placeholder="Введи свой никнейм"
-                          className="bg-cyber-grey/30 border-neon-green/30 text-white"
-                        />
-                      </div>
+                    <Tabs defaultValue="basic" className="mt-4">
+                      <TabsList className="bg-cyber-grey/30 border-neon-green/30 w-full">
+                        <TabsTrigger value="basic" className="text-white text-xs">Основное</TabsTrigger>
+                        <TabsTrigger value="colors" className="text-white text-xs">Цвета</TabsTrigger>
+                        <TabsTrigger value="effects" className="text-white text-xs">Эффекты</TabsTrigger>
+                        <TabsTrigger value="background" className="text-white text-xs">Фон</TabsTrigger>
+                      </TabsList>
                       
-                      <div>
-                        <Label className="text-white">Аватар</Label>
-                        <div className="grid grid-cols-6 gap-2 mt-2">
-                          {avatarOptions.map((avatar) => (
-                            <Button
-                              key={avatar}
-                              variant="outline"
-                              size="sm"
-                              className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-green bg-neon-green/20' : 'border-gray-600'}`}
-                              onClick={() => setUserProfile({...userProfile, avatar})}
-                            >
-                              {avatar}
-                            </Button>
-                          ))}
+                      <TabsContent value="basic" className="space-y-4">
+                        <div>
+                          <Label htmlFor="nickname" className="text-white">Никнейм</Label>
+                          <Input
+                            id="nickname"
+                            value={userProfile.nickname}
+                            onChange={(e) => setUserProfile({...userProfile, nickname: e.target.value})}
+                            placeholder="Введи свой никнейм"
+                            className="bg-cyber-grey/30 border-neon-green/30 text-white"
+                          />
                         </div>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-white">Цвет профиля</Label>
-                        <Select value={userProfile.profileColor} onValueChange={(value) => setUserProfile({...userProfile, profileColor: value})}>
-                          <SelectTrigger className="bg-cyber-grey/30 border-neon-green/30 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-cyber-dark border-neon-green/30">
-                            {colorOptions.map((color) => (
-                              <SelectItem key={color.name} value={color.name} className="text-white">
-                                <span className={color.class}>{color.label}</span>
-                              </SelectItem>
+                        
+                        <div>
+                          <Label className="text-white">Аватар</Label>
+                          <div className="grid grid-cols-6 gap-2 mt-2">
+                            {avatarOptions.map((avatar) => (
+                              <Button
+                                key={avatar}
+                                variant="outline"
+                                size="sm"
+                                className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-green bg-neon-green/20' : 'border-gray-600'}`}
+                                onClick={() => setUserProfile({...userProfile, avatar})}
+                              >
+                                {avatar}
+                              </Button>
                             ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                          </div>
+                        </div>
+                      </TabsContent>
                       
-                      <Button 
-                        onClick={handleRegister} 
-                        className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green hover:text-black"
-                        disabled={!userProfile.nickname.trim()}
-                      >
-                        Создать профиль
-                      </Button>
-                    </div>
+                      <TabsContent value="colors" className="space-y-4">
+                        <ColorPicker
+                          value={userProfile.customColor}
+                          onChange={(color) => setUserProfile({...userProfile, customColor: color})}
+                          label="Кастомный цвет никнейма"
+                        />
+                      </TabsContent>
+                      
+                      <TabsContent value="effects" className="space-y-4">
+                        <VisualEffects
+                          effects={userProfile.effects}
+                          onChange={(effects) => setUserProfile({...userProfile, effects})}
+                        />
+                      </TabsContent>
+                      
+                      <TabsContent value="background" className="space-y-4">
+                        <BackgroundSelector
+                          background={userProfile.background}
+                          onChange={(background) => setUserProfile({...userProfile, background})}
+                        />
+                      </TabsContent>
+                    </Tabs>
+                    
+                    <Button 
+                      onClick={handleRegister} 
+                      className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green hover:text-black mt-4"
+                      disabled={!userProfile.nickname.trim()}
+                    >
+                      Создать профиль
+                    </Button>
                   </DialogContent>
                 </Dialog>
               ) : (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button className="bg-neon-blue/20 border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black transition-all duration-300">
+                    <Button 
+                      className="bg-neon-blue/20 border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black transition-all duration-300"
+                      style={{ color: userProfile.customColor }}
+                    >
                       <span className="text-xl mr-2">{userProfile.avatar}</span>
                       {userProfile.nickname}
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-cyber-dark border-neon-blue/30 text-white max-w-2xl">
+                  <DialogContent className="bg-cyber-dark border-neon-blue/30 text-white max-w-4xl">
                     <DialogHeader>
-                      <DialogTitle className="text-2xl font-bold text-neon-blue font-['Orbitron'] flex items-center gap-3">
+                      <DialogTitle 
+                        className="text-2xl font-bold font-['Orbitron'] flex items-center gap-3"
+                        style={{ color: userProfile.customColor }}
+                      >
                         <span className="text-3xl">{userProfile.avatar}</span>
                         {userProfile.nickname}
                       </DialogTitle>
@@ -289,40 +335,73 @@ const Index = () => {
                       </TabsContent>
                       
                       <TabsContent value="customize" className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <Label className="text-white">Аватар</Label>
-                            <div className="grid grid-cols-6 gap-2 mt-2">
-                              {avatarOptions.map((avatar) => (
-                                <Button
-                                  key={avatar}
-                                  variant="outline"
-                                  size="sm"
-                                  className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-blue bg-neon-blue/20' : 'border-gray-600'}`}
-                                  onClick={() => setUserProfile({...userProfile, avatar})}
-                                >
-                                  {avatar}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
+                        <Tabs defaultValue="basic" className="w-full">
+                          <TabsList className="bg-cyber-grey/30 border-neon-blue/30 w-full">
+                            <TabsTrigger value="basic" className="text-white text-xs">Основное</TabsTrigger>
+                            <TabsTrigger value="colors" className="text-white text-xs">Цвета</TabsTrigger>
+                            <TabsTrigger value="effects" className="text-white text-xs">Эффекты</TabsTrigger>
+                            <TabsTrigger value="background" className="text-white text-xs">Фон</TabsTrigger>
+                          </TabsList>
                           
-                          <div>
-                            <Label className="text-white">Цвет профиля</Label>
-                            <Select value={userProfile.profileColor} onValueChange={(value) => setUserProfile({...userProfile, profileColor: value})}>
-                              <SelectTrigger className="bg-cyber-grey/30 border-neon-blue/30 text-white mt-2">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-cyber-dark border-neon-blue/30">
-                                {colorOptions.map((color) => (
-                                  <SelectItem key={color.name} value={color.name} className="text-white">
-                                    <span className={color.class}>{color.label}</span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
+                          <TabsContent value="basic" className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-white">Аватар</Label>
+                                <div className="grid grid-cols-6 gap-2 mt-2">
+                                  {avatarOptions.map((avatar) => (
+                                    <Button
+                                      key={avatar}
+                                      variant="outline"
+                                      size="sm"
+                                      className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-blue bg-neon-blue/20' : 'border-gray-600'}`}
+                                      onClick={() => setUserProfile({...userProfile, avatar})}
+                                    >
+                                      {avatar}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <Label className="text-white">Цвет профиля</Label>
+                                <Select value={userProfile.profileColor} onValueChange={(value) => setUserProfile({...userProfile, profileColor: value})}>
+                                  <SelectTrigger className="bg-cyber-grey/30 border-neon-blue/30 text-white mt-2">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-cyber-dark border-neon-blue/30">
+                                    {colorOptions.map((color) => (
+                                      <SelectItem key={color.name} value={color.name} className="text-white">
+                                        <span className={color.class}>{color.label}</span>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </TabsContent>
+                          
+                          <TabsContent value="colors" className="space-y-4">
+                            <ColorPicker
+                              value={userProfile.customColor}
+                              onChange={(color) => setUserProfile({...userProfile, customColor: color})}
+                              label="Кастомный цвет никнейма"
+                            />
+                          </TabsContent>
+                          
+                          <TabsContent value="effects" className="space-y-4">
+                            <VisualEffects
+                              effects={userProfile.effects}
+                              onChange={(effects) => setUserProfile({...userProfile, effects})}
+                            />
+                          </TabsContent>
+                          
+                          <TabsContent value="background" className="space-y-4">
+                            <BackgroundSelector
+                              background={userProfile.background}
+                              onChange={(background) => setUserProfile({...userProfile, background})}
+                            />
+                          </TabsContent>
+                        </Tabs>
                       </TabsContent>
                     </Tabs>
                   </DialogContent>
@@ -365,7 +444,7 @@ const Index = () => {
           ))}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <Card className="bg-cyber-dark/60 border-neon-green/30 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-neon-green flex items-center gap-2 font-['Orbitron']">
@@ -426,6 +505,13 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+          
+          <div className="lg:col-span-1">
+            <Chat 
+              userProfile={userProfile} 
+              isRegistered={isRegistered} 
+            />
+          </div>
         </div>
       </main>
 
