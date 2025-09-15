@@ -2,15 +2,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Icon from "@/components/ui/icon";
+import { useState } from "react";
 
 const Index = () => {
+  const [userProfile, setUserProfile] = useState({
+    nickname: "",
+    avatar: "🔥",
+    profileColor: "neon-green",
+    bio: "",
+    favoriteMode: "ranked"
+  });
+
+  const [isRegistered, setIsRegistered] = useState(false);
+
   const topPlayers = [
-    { name: "ShadowHunter", kills: 2847, wins: 892, rank: "Diamond", avatar: "🔥" },
-    { name: "NeonKnight", kills: 2634, wins: 876, rank: "Diamond", avatar: "⚡" },
-    { name: "CyberWolf", kills: 2456, wins: 823, rank: "Gold", avatar: "🐺" },
-    { name: "GlowMaster", kills: 2298, wins: 789, rank: "Gold", avatar: "✨" },
-    { name: "PixelWarrior", kills: 2156, wins: 756, rank: "Silver", avatar: "⚔️" }
+    { id: 1, name: "ShadowHunter", kills: 2847, wins: 892, rank: "Diamond", avatar: "🔥", kd: 2.84, winrate: 76, playtime: "247ч", bio: "Профессиональный убийца в BedWars", achievements: ["Убийца", "Защитник"] },
+    { id: 2, name: "NeonKnight", kills: 2634, wins: 876, rank: "Diamond", avatar: "⚡", kd: 2.73, winrate: 78, playtime: "289ч", bio: "Молниеносные атаки", achievements: ["Строитель", "Снайпер"] },
+    { id: 3, name: "CyberWolf", kills: 2456, wins: 823, rank: "Gold", avatar: "🐺", kd: 2.45, winrate: 71, playtime: "198ч", bio: "Одинокий волк арены", achievements: ["Убийца"] },
+    { id: 4, name: "GlowMaster", kills: 2298, wins: 789, rank: "Gold", avatar: "✨", kd: 2.32, winrate: 69, playtime: "156ч", bio: "Мастер световых эффектов", achievements: ["Защитник", "Строитель"] },
+    { id: 5, name: "PixelWarrior", kills: 2156, wins: 756, rank: "Silver", avatar: "⚔️", kd: 2.18, winrate: 67, playtime: "134ч", bio: "Пиксельный воин", achievements: ["Новичок"] }
   ];
 
   const serverStats = [
@@ -18,6 +34,15 @@ const Index = () => {
     { label: "Игр сегодня", value: "2,456", icon: "Gamepad2" },
     { label: "Всего убийств", value: "1.2M", icon: "Sword" },
     { label: "Побед сегодня", value: "892", icon: "Trophy" }
+  ];
+
+  const avatarOptions = ["🔥", "⚡", "🐺", "✨", "⚔️", "🎯", "💀", "👑", "🛡️", "🏹", "⭐", "💎"];
+  const colorOptions = [
+    { name: "neon-green", label: "Неон зелёный", class: "text-neon-green" },
+    { name: "neon-pink", label: "Неон розовый", class: "text-neon-pink" },
+    { name: "neon-blue", label: "Неон синий", class: "text-neon-blue" },
+    { name: "gold", label: "Золотой", class: "text-yellow-400" },
+    { name: "silver", label: "Серебряный", class: "text-gray-300" }
   ];
 
   const getRankColor = (rank: string) => {
@@ -29,6 +54,97 @@ const Index = () => {
     }
   };
 
+  const handleRegister = () => {
+    if (userProfile.nickname.trim()) {
+      setIsRegistered(true);
+    }
+  };
+
+  const PlayerProfileModal = ({ player }: { player: typeof topPlayers[0] }) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="w-full p-3 rounded-lg bg-cyber-grey/30 border border-gray-600/50 hover:border-neon-green/50 transition-all duration-300 group">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-3">
+              <div className="text-2xl">{player.avatar}</div>
+              <div>
+                <div className="font-semibold text-white group-hover:text-neon-green transition-colors text-left">
+                  #{topPlayers.indexOf(player) + 1} {player.name}
+                </div>
+                <Badge className={`text-xs ${getRankColor(player.rank)}`}>
+                  {player.rank}
+                </Badge>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-neon-green font-bold">{player.kills} убийств</div>
+              <div className="text-gray-400 text-sm">{player.wins} побед</div>
+            </div>
+          </div>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-cyber-dark border-neon-green/30 text-white max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-neon-green font-['Orbitron'] flex items-center gap-3">
+            <span className="text-3xl">{player.avatar}</span>
+            {player.name}
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            {player.bio}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <Card className="bg-cyber-grey/30 border-neon-green/30">
+            <CardHeader>
+              <CardTitle className="text-lg text-neon-green">Статистика</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Убийства:</span>
+                <span className="text-neon-green font-bold">{player.kills}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Победы:</span>
+                <span className="text-neon-blue font-bold">{player.wins}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">K/D:</span>
+                <span className="text-neon-pink font-bold">{player.kd}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Винрейт:</span>
+                <span className="text-yellow-400 font-bold">{player.winrate}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Время в игре:</span>
+                <span className="text-white font-bold">{player.playtime}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-cyber-grey/30 border-neon-pink/30">
+            <CardHeader>
+              <CardTitle className="text-lg text-neon-pink">Достижения</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Badge className={`${getRankColor(player.rank)} mb-2`}>
+                  {player.rank}
+                </Badge>
+                {player.achievements.map((achievement, index) => (
+                  <Badge key={index} className="mr-2 text-neon-blue bg-neon-blue/20 border-neon-blue">
+                    {achievement}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyber-darker via-cyber-dark to-cyber-grey dark">
       <nav className="border-b border-neon-green/30 bg-cyber-dark/50 backdrop-blur-sm">
@@ -39,19 +155,179 @@ const Index = () => {
                 BEDWARS PRO
               </div>
             </div>
-            <div className="hidden md:flex space-x-6">
-              <Button variant="ghost" className="text-neon-green hover:text-neon-green hover:bg-neon-green/10">
-                Главная
-              </Button>
-              <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
-                Рейтинг
-              </Button>
-              <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
-                Статистика
-              </Button>
-              <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
-                Профили
-              </Button>
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex space-x-6">
+                <Button variant="ghost" className="text-neon-green hover:text-neon-green hover:bg-neon-green/10">
+                  Главная
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
+                  Рейтинг
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
+                  Статистика
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-neon-green hover:bg-neon-green/10">
+                  Профили
+                </Button>
+              </div>
+              
+              {!isRegistered ? (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green hover:text-black transition-all duration-300">
+                      <Icon name="UserPlus" size={16} className="mr-2" />
+                      Регистрация
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-cyber-dark border-neon-green/30 text-white">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold text-neon-green font-['Orbitron']">
+                        Регистрация игрока
+                      </DialogTitle>
+                      <DialogDescription className="text-gray-400">
+                        Создай свой профиль на сервере BedWars Pro
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4 mt-4">
+                      <div>
+                        <Label htmlFor="nickname" className="text-white">Никнейм</Label>
+                        <Input
+                          id="nickname"
+                          value={userProfile.nickname}
+                          onChange={(e) => setUserProfile({...userProfile, nickname: e.target.value})}
+                          placeholder="Введи свой никнейм"
+                          className="bg-cyber-grey/30 border-neon-green/30 text-white"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-white">Аватар</Label>
+                        <div className="grid grid-cols-6 gap-2 mt-2">
+                          {avatarOptions.map((avatar) => (
+                            <Button
+                              key={avatar}
+                              variant="outline"
+                              size="sm"
+                              className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-green bg-neon-green/20' : 'border-gray-600'}`}
+                              onClick={() => setUserProfile({...userProfile, avatar})}
+                            >
+                              {avatar}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-white">Цвет профиля</Label>
+                        <Select value={userProfile.profileColor} onValueChange={(value) => setUserProfile({...userProfile, profileColor: value})}>
+                          <SelectTrigger className="bg-cyber-grey/30 border-neon-green/30 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-cyber-dark border-neon-green/30">
+                            {colorOptions.map((color) => (
+                              <SelectItem key={color.name} value={color.name} className="text-white">
+                                <span className={color.class}>{color.label}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <Button 
+                        onClick={handleRegister} 
+                        className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green hover:text-black"
+                        disabled={!userProfile.nickname.trim()}
+                      >
+                        Создать профиль
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="bg-neon-blue/20 border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black transition-all duration-300">
+                      <span className="text-xl mr-2">{userProfile.avatar}</span>
+                      {userProfile.nickname}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-cyber-dark border-neon-blue/30 text-white max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold text-neon-blue font-['Orbitron'] flex items-center gap-3">
+                        <span className="text-3xl">{userProfile.avatar}</span>
+                        {userProfile.nickname}
+                      </DialogTitle>
+                    </DialogHeader>
+                    
+                    <Tabs defaultValue="profile" className="mt-4">
+                      <TabsList className="bg-cyber-grey/30 border-neon-blue/30">
+                        <TabsTrigger value="profile" className="text-white">Профиль</TabsTrigger>
+                        <TabsTrigger value="customize" className="text-white">Кастомизация</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="profile" className="space-y-4">
+                        <Card className="bg-cyber-grey/30 border-neon-blue/30">
+                          <CardHeader>
+                            <CardTitle className="text-lg text-neon-blue">Ваша статистика</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">Убийства:</span>
+                              <span className="text-neon-green font-bold">0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">Победы:</span>
+                              <span className="text-neon-blue font-bold">0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">Ранг:</span>
+                              <Badge className="text-gray-400 bg-gray-400/20 border-gray-400">Новичок</Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      
+                      <TabsContent value="customize" className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-white">Аватар</Label>
+                            <div className="grid grid-cols-6 gap-2 mt-2">
+                              {avatarOptions.map((avatar) => (
+                                <Button
+                                  key={avatar}
+                                  variant="outline"
+                                  size="sm"
+                                  className={`text-2xl h-12 ${userProfile.avatar === avatar ? 'border-neon-blue bg-neon-blue/20' : 'border-gray-600'}`}
+                                  onClick={() => setUserProfile({...userProfile, avatar})}
+                                >
+                                  {avatar}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label className="text-white">Цвет профиля</Label>
+                            <Select value={userProfile.profileColor} onValueChange={(value) => setUserProfile({...userProfile, profileColor: value})}>
+                              <SelectTrigger className="bg-cyber-grey/30 border-neon-blue/30 text-white mt-2">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-cyber-dark border-neon-blue/30">
+                                {colorOptions.map((color) => (
+                                  <SelectItem key={color.name} value={color.name} className="text-white">
+                                    <span className={color.class}>{color.label}</span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </div>
         </div>
@@ -99,24 +375,8 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topPlayers.map((player, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-cyber-grey/30 border border-gray-600/50 hover:border-neon-green/50 transition-all duration-300 group">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-2xl">{player.avatar}</div>
-                      <div>
-                        <div className="font-semibold text-white group-hover:text-neon-green transition-colors">
-                          #{index + 1} {player.name}
-                        </div>
-                        <Badge className={`text-xs ${getRankColor(player.rank)}`}>
-                          {player.rank}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-neon-green font-bold">{player.kills} убийств</div>
-                      <div className="text-gray-400 text-sm">{player.wins} побед</div>
-                    </div>
-                  </div>
+                {topPlayers.map((player) => (
+                  <PlayerProfileModal key={player.id} player={player} />
                 ))}
               </div>
             </CardContent>
@@ -167,45 +427,6 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
-
-        <section className="mt-12">
-          <Card className="bg-cyber-dark/60 border-neon-blue/30 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-neon-blue flex items-center gap-2 font-['Orbitron']">
-                <Icon name="Settings" size={24} />
-                КАСТОМИЗАЦИЯ ПРОФИЛЯ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white">Ранги и достижения</h3>
-                  <div className="space-y-2">
-                    <Badge className="text-neon-blue bg-neon-blue/20 border-neon-blue">Убийца</Badge>
-                    <Badge className="text-neon-green bg-neon-green/20 border-neon-green">Защитник</Badge>
-                    <Badge className="text-neon-pink bg-neon-pink/20 border-neon-pink">Строитель</Badge>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white">Статистика</h3>
-                  <div className="text-sm space-y-1 text-gray-300">
-                    <div>K/D: <span className="text-neon-green">2.84</span></div>
-                    <div>Винрейт: <span className="text-neon-blue">76%</span></div>
-                    <div>Время в игре: <span className="text-neon-pink">247ч</span></div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white">Настройки</h3>
-                  <Button className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green hover:text-black transition-all duration-300">
-                    Редактировать профиль
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
       </main>
 
       <footer className="mt-16 border-t border-neon-green/30 bg-cyber-dark/50 backdrop-blur-sm">
